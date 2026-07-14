@@ -12,19 +12,28 @@ APP_NAME = "travel-planner_app"
 USER_ID = "user_1"
 SESSION_ID = "session_001"
 
+# Created once and reused across requests so conversation history is retained
+# for the life of the process (InMemory: resets on restart).
+_session_service = InMemorySessionService()
+
 
 async def setup_session_and_runner(root_agent: Agent | None = None, session_id: str = SESSION_ID):
-    """Set up the InMemorySessionService and Runner instances for one conversation."""
-    session_service = InMemorySessionService()
-    session = await session_service.create_session(
+    """Set up the Runner against the shared session service, reusing the session."""
+    session = await _session_service.get_session(
         app_name=APP_NAME,
         user_id=USER_ID,
         session_id=session_id,
     )
+    if session is None:
+        session = await _session_service.create_session(
+            app_name=APP_NAME,
+            user_id=USER_ID,
+            session_id=session_id,
+        )
     runner = Runner(
         agent=root_agent,
         app_name=APP_NAME,
-        session_service=session_service,
+        session_service=_session_service,
     )
     return session, runner
 
