@@ -30,11 +30,17 @@ async def setup_session_and_runner(root_agent: Agent | None = None, session_id: 
 
 
 async def call_agent_async(query: str, root_agent: Agent | None = None, session_id: str = SESSION_ID) -> str:
-    """Workshop TODO: send the user's query to the runner and capture the final response."""
-    raise NotImplementedError(
-        "Create a google.genai.types.Content payload, feed it through Runner.run_async, and parse the final "
-        "response text to return to the caller."
-    )
+    """Send the user's query to the runner and capture the final response text."""
+    _, runner = await setup_session_and_runner(root_agent=root_agent, session_id=session_id)
+
+    content = types.Content(role="user", parts=[types.Part(text=query)])
+
+    final_response = ""
+    async for event in runner.run_async(user_id=USER_ID, session_id=session_id, new_message=content):
+        if event.is_final_response() and event.content and event.content.parts:
+            final_response = event.content.parts[0].text
+
+    return final_response
 
 
 async def run_agent_pipeline(query: str) -> str:
