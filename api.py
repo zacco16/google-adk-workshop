@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pathlib import Path
 from dotenv import load_dotenv
@@ -8,6 +9,14 @@ load_dotenv(Path(__file__).parent / "my_travel_planner" / ".env")
 from run import run_agent_pipeline
 
 app = FastAPI(title="Travel Planner AI", description="Powered by Google ADK + Gemini")
+
+STATIC_DIR = Path(__file__).parent / "static"
+
+
+@app.get("/", include_in_schema=False)
+async def index():
+    """Serve the lightweight chat frontend."""
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 class QueryRequest(BaseModel):
