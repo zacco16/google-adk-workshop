@@ -14,11 +14,19 @@ SESSION_ID = "session_001"
 
 
 async def setup_session_and_runner(root_agent: Agent | None = None, session_id: str = SESSION_ID):
-    """Workshop TODO: set up the InMemorySessionService and Runner instances."""
-    raise NotImplementedError(
-        "Instantiate InMemorySessionService, create a session, and return the session along with a Runner bound to "
-        "your root agent."
+    """Set up the InMemorySessionService and Runner instances for one conversation."""
+    session_service = InMemorySessionService()
+    session = await session_service.create_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id=session_id,
     )
+    runner = Runner(
+        agent=root_agent,
+        app_name=APP_NAME,
+        session_service=session_service,
+    )
+    return session, runner
 
 
 async def call_agent_async(query: str, root_agent: Agent | None = None, session_id: str = SESSION_ID) -> str:
