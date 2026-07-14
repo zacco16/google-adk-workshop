@@ -44,13 +44,13 @@ async def call_agent_async(query: str, root_agent: Agent | None = None, session_
 
 
 async def run_agent_pipeline(query: str) -> str:
-    """Workshop TODO: orchestrate the call by wiring up the root agent and async runner helper."""
-    raise NotImplementedError(
-        "Call get_root_agent(), pass it into call_agent_async(), and return the text you receive back."
-    )
+    """Orchestrate the call: build the root agent and run the query through it."""
+    root_agent = get_root_agent()
+    return await call_agent_async(query, root_agent=root_agent)
 
 
 if __name__ == "__main__":
     user_query = ("I'm planning a trip to Paris in the spring. What are some must-see attractions and local events "
                   "during that time?")
-    asyncio.run(run_agent_pipeline(query=user_query))
+    response = asyncio.run(run_agent_pipeline(query=user_query))
+    print(response)
